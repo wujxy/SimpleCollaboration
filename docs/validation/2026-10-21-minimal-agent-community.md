@@ -42,6 +42,14 @@ The first smoke exposed a lifecycle defect: a `command_lifecycle: completed` eve
 
 ## Interpretation and limits
 
-This validates mechanism, not research quality: independent Claude sessions can discover one another, exchange native messages in both directions, wake on peer work, share files, and terminate as one owned process tree. The live smoke used the host's default `deepseek-flash[1m]`; the ParticleBench `kimi-k3` path was validated without a real model request and still requires a benchmark run.
+This validates mechanism, not research quality: independent Claude sessions can discover one another, exchange native messages in both directions, wake on peer work, share files, and terminate as one owned process tree. The live smoke used the host's default `deepseek-flash[1m]`.
 
 The smoke also showed the fixed cost clearly: each fresh member's first request read roughly 24k input tokens before useful collaboration began. A three-member benchmark therefore needs to justify parallelism with better decisions or elapsed time; the community harness does not make multi-agent inference cheap by itself.
+
+## ParticleBench live run
+
+A three-member 2-hour jmrb run was launched with `moonshot/kimi-k3`, effort `high`, and the model-specific unified-interface credential. Run directory:
+
+`/datafs/users/wujxy/agent-sci/jev_for_sci/pilot-runs/jmrb-simple-collaboration-moonshot-kimi-k3-simplecollab-r1-2h-20261021-230514-80b2f0`
+
+At the initial 91-second check, the ParticleBench runner, Apptainer parent, community supervisor, and all three Claude children were alive. The proxy had recorded eight successful HTTP 200 model requests with usage. All three members were independently active; the trace contained one `ListAgents` call and no `SendMessage` call yet. This is an early behavior observation, not evidence that useful collaboration has formed or that the benchmark will score well.
