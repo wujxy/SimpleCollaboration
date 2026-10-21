@@ -1,0 +1,9 @@
+.worktrees/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.pyright/
+node_modules/
+dist/
+*.egg-info/
+.simplecollab/
