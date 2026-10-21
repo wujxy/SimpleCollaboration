@@ -26,7 +26,6 @@ def _parser() -> argparse.ArgumentParser:
     standalone.add_argument("--state-dir", type=Path)
     compatible = subparsers.choices["compat"]
     compatible.add_argument("--resume", action="store_true")
-    compatible.add_argument("--child-arg", action="append", default=[])
     return parser
 
 
@@ -56,10 +55,9 @@ def _config(args: argparse.Namespace) -> RunConfig:
             raise ValueError("compat mode requires CLAUDE_CONFIG_DIR")
         state_dir = Path(config_root) / "simplecollab" / "run-community"
         resume = _resume_sessions(state_dir) if args.resume else {}
-        extra = tuple(value for item in args.child_arg for value in ("--" + item).splitlines())
     else:
         state_dir = args.state_dir or cwd / ".simplecollab" / "runs" / f"run-{uuid.uuid4().hex[:8]}"
-        resume, extra = {}, ()
+        resume = {}
     return RunConfig(
         cwd=cwd,
         state_dir=state_dir.expanduser().resolve(),
@@ -70,7 +68,6 @@ def _config(args: argparse.Namespace) -> RunConfig:
         effort=args.effort,
         permission_mode=args.permission_mode,
         resume_sessions=resume,
-        extra_argv=extra,
     )
 
 

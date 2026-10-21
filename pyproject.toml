@@ -7,11 +7,14 @@ name = "simplecollaboration"
 version = "0.1.0"
 description = "A minimal peer Claude Code community"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = []
 
 [project.scripts]
 simplecollab = "simplecollab.cli:main"
+
+[project.entry-points."jbench.agents"]
+simple-collaboration = "simplecollab.particlebench:CommunityArm"
 
 [tool.setuptools.packages.find]
 include = ["simplecollab*"]

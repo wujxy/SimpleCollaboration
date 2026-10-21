@@ -25,7 +25,6 @@ class RunConfig:
     effort: str | None = None
     permission_mode: str | None = None
     resume_sessions: Mapping[str, str] = field(default_factory=dict)
-    extra_argv: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -73,7 +72,6 @@ def build_specs(config: RunConfig, names: tuple[str, ...]) -> tuple[MemberSpec, 
         session_id = config.resume_sessions.get(name)
         if session_id:
             argv.extend(("--resume", session_id))
-        argv.extend(config.extra_argv)
         specs.append(MemberSpec(name=name, cwd=config.cwd, argv=tuple(argv)))
     return tuple(specs)
 
