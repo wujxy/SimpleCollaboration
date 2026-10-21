@@ -1,0 +1,12 @@
+{
+  "name": "simplecollaboration-dev",
+  "private": true,
+  "scripts": {
+    "dev": "python -m simplecollab",
+    "test": "python scripts/test.py",
+    "typecheck": "pyright simplecollab tests"
+  },
+  "devDependencies": {
+    "pyright": "^1.1.407"
+  }
+}
