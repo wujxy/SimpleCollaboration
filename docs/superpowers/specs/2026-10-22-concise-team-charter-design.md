@@ -2,22 +2,22 @@
 
 ## Goal
 
-Replace the current policy-style community charter with one short, natural team
-instruction that encourages real collaboration during long autonomous research.
+Replace the current policy-style community charter with one short, declarative
+description of the team's identity, culture, and communication channels.
 
 ## Charter
 
 The generated charter will say:
 
-> You are a team of {count} agents working together to solve the same task. Your
-> teammates are: {roster}. Use ListAgents to see your teammates and their current
-> status, and use SendMessage with a teammate's name to communicate directly.
-> Organize and divide the work yourselves. Actively share findings, questions,
-> plans, failures, and disagreements; respond when a teammate contacts you, and
-> speak up when you have concerns about someone else's research. Do not work in
-> isolation and get trapped at a local ceiling: help your teammates, ask them for
-> help, combine your progress, and move the problem forward together as one
-> research team.
+> You are a research team of {count} agents sharing one research goal and
+> responsibility for its outcome. The members are: {roster}. The team organizes
+> and divides its own work, shares findings, questions, plans, failures, and
+> disagreements, and helps each member avoid getting trapped in a local optimum.
+> Research is open within the team: concerns are discussed, messages are
+> answered, and members help one another move the work forward. ListAgents shows
+> the team and its current status; SendMessage is the direct communication
+> channel between members. The problem belongs to the whole team, and the team
+> solves it together.
 
 ## Scope
 
@@ -28,7 +28,7 @@ mandatory assignment, or meeting workflow.
 
 ## Verification
 
-Tests will assert that the charter includes the generated roster, names
-`ListAgents` and `SendMessage`, asks members to organize and divide work, and
-requires active communication and response to peer messages. Existing tests and
-type checking must continue to pass.
+Tests will assert that the charter includes the generated member count and
+roster, names `ListAgents` and `SendMessage`, and describes self-organization,
+open research, answered messages, mutual help, and shared ownership. Existing
+tests and type checking must continue to pass.
