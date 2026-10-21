@@ -20,6 +20,8 @@ The team organizes and divides its own work, shares findings, questions, plans,
 failures, and disagreements, and helps each member avoid getting trapped in a
 local optimum. Research is open within the team: concerns are discussed,
 messages are answered, and members help one another move the work forward.
+When a teammate speaks to a member, that member responds in a way that
+lets the teammate know the message was received and understand what the member thinks.
 
 ListAgents shows the team and its current status; SendMessage is the direct
 communication channel between members. The problem belongs to the whole team,

@@ -12,6 +12,9 @@
 
 - Preserve the existing `member_names(run_id: str, count: int) -> tuple[str, ...]` and `build_charter(names: tuple[str, ...]) -> str` interfaces.
 - Keep the charter declarative: it describes team identity, culture, and communication channels rather than issuing a sequence of commands.
+- Describe responsive communication as team etiquette: a teammate can tell that
+  their message was received and understand the recipient's view. Add no reply
+  format, deadline, or fixed response categories.
 - Add no roles, leader, assignment gate, meeting workflow, runtime behavior, dependency, or configuration.
 - Do not modify secrets, `.env`, ParticleBench, or production configuration.
 
@@ -93,4 +96,60 @@ git commit -m "feat: make community charter team-oriented"
 
 - [ ] **Step 7: Restart the authorized benchmark run**
 
-Confirm the prior ParticleBench run has no surviving process. Launch a fresh JMRB run with the same three-member SimpleCollaboration adapter, Kimi K3 model, high effort, and 7200-second wall budget. Verify the new run has three live member sessions, the generated charter contains the approved declarative text, and the proxy records successful model responses.
+Stop the current short Kimi pilot through ParticleBench. Launch the formal JMRB
+run with the same three-member SimpleCollaboration adapter and the DeepSeek
+configuration used by the earlier comparison runs, using the task's full-day
+wall budget. Verify the new run has three live member sessions, the generated
+charter contains the approved declarative text, and the proxy records successful
+model responses.
+
+---
+
+### Task 2: Responsive Team Etiquette
+
+**Files:**
+- Modify: `tests/test_charter.py`
+- Modify: `simplecollab/charter.py`
+
+**Interfaces:**
+- Consumes: `build_charter(names: tuple[str, ...]) -> str`
+- Produces: the existing charter plus a declarative description of responsive
+  teammate communication.
+
+- [ ] **Step 1: Write the failing test**
+
+Add assertions that the charter says a teammate can tell the message was
+received and understand the recipient's view, without prescribing fixed reply
+categories.
+
+```python
+self.assertIn("lets the teammate know the message was received", text)
+self.assertIn("understand what the member thinks", text)
+self.assertNotIn("accepted, declined", text)
+```
+
+- [ ] **Step 2: Run the focused test and verify RED**
+
+Run: `python -m unittest tests.test_charter.CharterTests.test_charter_names_every_peer_without_roles -v`
+
+Expected: FAIL because the current charter does not contain the responsive
+communication language.
+
+- [ ] **Step 3: Implement the minimal charter change**
+
+Add one declarative sentence describing that team members respond when spoken
+to so teammates know their messages were received and understand what each
+member thinks.
+
+```text
+When a teammate speaks to a member, that member responds in a way that lets the
+teammate know the message was received and understand what the member thinks.
+```
+
+- [ ] **Step 4: Run focused and full verification**
+
+Run the focused unittest, `npm test`, and `npm run typecheck`; all must pass.
+
+- [ ] **Step 5: Commit**
+
+Commit only the charter, focused test, and the two updated design documents.
