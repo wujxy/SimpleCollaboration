@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any, cast
 
 from jbench.agents import ArmSession, RunContext
 from jbench.agents.terminal import (
@@ -35,7 +36,8 @@ class CommunityArm(TerminalArm):
         return spec
 
     def _launch(self, ctx: RunContext, resume_session, stdin_path, label) -> ArmSession:
-        task = ctx.task
+        task = cast(Any, ctx.task)
+        sandbox = cast(Any, ctx.sandbox)
         api_key = getattr(self, "api_key", None)
         base_url = ctx.api_url(self.base_url)
         binds = ctx.world_binds()
@@ -80,7 +82,7 @@ class CommunityArm(TerminalArm):
             *([] if self.effort is None else ["--effort", self.effort]),
             *([] if resume_session is None else ["--resume"]),
         ]
-        argv = ctx.sandbox.build_argv(
+        argv = sandbox.build_argv(
             binds=binds,
             cwd="/work",
             command=command,
@@ -89,7 +91,7 @@ class CommunityArm(TerminalArm):
             memory=task.agent_memory,
             gpus=getattr(task, "agent_gpus", 0),
         )
-        proc = ctx.sandbox.spawn(
+        proc = sandbox.spawn(
             argv,
             env,
             stdin_path=stdin_path,

@@ -1,5 +1,6 @@
 {
-  "pythonVersion": "3.9",
+  "pythonVersion": "3.10",
   "typeCheckingMode": "standard",
+  "extraPaths": ["../../../../particle-lab/ParticleBench", "../ParticleBench", "../../../ParticleBench"],
   "exclude": [".worktrees", "node_modules"]
 }

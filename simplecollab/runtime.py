@@ -9,7 +9,8 @@ import subprocess
 import sys
 import threading
 import time
-from typing import IO, Mapping, TextIO
+from types import FrameType
+from typing import Any, Callable, IO, Mapping, TextIO
 
 from .charter import build_charter, member_names
 
@@ -123,9 +124,22 @@ def _input_message(task: str) -> str:
     ) + "\n"
 
 
+def _event_state(current: str, event: Mapping[str, object]) -> str:
+    kind = event.get("type")
+    if kind == "result":
+        return "idle"
+    if kind == "assistant" or (
+        kind == "system" and event.get("subtype") == "thinking_tokens"
+    ):
+        return "running"
+    if kind == "command_lifecycle" and event.get("state") != "completed":
+        return "running"
+    return current
+
+
 def run(config: RunConfig, task: str, *, output: TextIO | None = None) -> int:
     """Run one peer community until all surviving members are quiescent."""
-    output = output or sys.stdout
+    output_stream: TextIO = output if output is not None else sys.stdout
     config.state_dir.mkdir(parents=True, exist_ok=True)
     run_token = config.state_dir.name.removeprefix("run-")
     names = member_names(run_token, config.members)
@@ -137,7 +151,7 @@ def run(config: RunConfig, task: str, *, output: TextIO | None = None) -> int:
     events_path = config.state_dir / "events.jsonl"
     events_path.touch(exist_ok=True)
     env = {key: value for key, value in os.environ.items()}
-    events = _Events(events_path, output, _secret_values(env))
+    events = _Events(events_path, output_stream, _secret_values(env))
     specs = build_specs(config, names)
     members: dict[str, _Member] = {}
     state_lock = threading.Lock()
@@ -147,7 +161,9 @@ def run(config: RunConfig, task: str, *, output: TextIO | None = None) -> int:
     last_activity = time.monotonic()
     stopping = False
     caught_signal: int | None = None
-    previous_handlers: dict[int, object] = {}
+    previous_handlers: dict[
+        int, int | signal.Handlers | Callable[[int, FrameType | None], Any] | None
+    ] = {}
 
     def request_stop(number, _frame) -> None:
         nonlocal caught_signal
@@ -192,7 +208,7 @@ def run(config: RunConfig, task: str, *, output: TextIO | None = None) -> int:
                 with state_lock:
                     if event.get("session_id"):
                         member.session_id = str(event["session_id"])
-                    member.state = "idle" if event.get("type") == "result" else "running"
+                    member.state = _event_state(member.state, event)
                 events.emit(event)
             except (ValueError, TypeError, json.JSONDecodeError):
                 events.emit(

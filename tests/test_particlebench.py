@@ -5,38 +5,41 @@ from pathlib import Path
 from types import SimpleNamespace
 import sys
 import tempfile
-import tomllib
+from typing import cast
 import unittest
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PB_ROOT = Path(__file__).resolve().parents[4] / "ParticleBench"
+PB_ROOT = Path(__file__).resolve().parents[5] / "particle-lab" / "ParticleBench"
 sys.path.insert(0, str(PB_ROOT))
 
 from jbench.agents.terminal import TerminalArm  # noqa: E402
+from jbench.agents import RunContext  # noqa: E402
 
 from simplecollab.particlebench import CommunityArm  # noqa: E402
 
 
 class _Sandbox:
     def __init__(self):
-        self.built = None
-        self.spawned = None
+        self.built: dict = {}
+        self.spawned: dict = {}
 
     def build_argv(self, **kwargs):
         self.built = kwargs
         return ["sandbox", *kwargs["command"]]
 
     def spawn(self, argv, env, **kwargs):
-        self.spawned = (argv, env, kwargs)
+        self.spawned = {"argv": argv, "env": env, **kwargs}
         return SimpleNamespace(pid=123)
 
 
 class ParticleBenchTests(unittest.TestCase):
     def test_plugin_entry_point_and_inherited_protocol(self):
-        data = tomllib.loads((ROOT / "pyproject.toml").read_text())
-        entries = data["project"]["entry-points"]["jbench.agents"]
-        self.assertEqual(entries["simple-collaboration"], "simplecollab.particlebench:CommunityArm")
+        project = (ROOT / "pyproject.toml").read_text()
+        self.assertIn('[project.entry-points."jbench.agents"]', project)
+        self.assertIn(
+            'simple-collaboration = "simplecollab.particlebench:CommunityArm"', project
+        )
         self.assertTrue(issubclass(CommunityArm, TerminalArm))
         self.assertIs(CommunityArm.start, TerminalArm.start)
         self.assertIs(CommunityArm.resume, TerminalArm.resume)
@@ -70,15 +73,20 @@ class ParticleBenchTests(unittest.TestCase):
             stdin = root / "instruction.txt"
             stdin.write_text("particlebench prompt")
 
-            session = arm._launch(ctx, resume_session="previous", stdin_path=stdin, label="community")
+            session = arm._launch(
+                cast(RunContext, ctx),
+                resume_session="previous",
+                stdin_path=stdin,
+                label="community",
+            )
 
             command = sandbox.built["command"]
             self.assertEqual(command[:3], ["python3", "-m", "simplecollab"])
             self.assertIn("compat", command)
             self.assertEqual(command[command.index("--members") + 1], "3")
             self.assertIn("--resume", command)
-            self.assertEqual(sandbox.spawned[2]["stdin_path"], stdin)
-            self.assertEqual(sandbox.spawned[2]["stdout_path"], root / "trace.jsonl")
+            self.assertEqual(sandbox.spawned["stdin_path"], stdin)
+            self.assertEqual(sandbox.spawned["stdout_path"], root / "trace.jsonl")
             self.assertEqual(session.label, "community")
             self.assertTrue(any(bind.dst == "/opt/simplecollab-src" for bind in sandbox.built["binds"]))
 

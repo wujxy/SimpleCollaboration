@@ -4,6 +4,7 @@ __pycache__/
 .pytest_cache/
 .pyright/
 node_modules/
+.venv*/
 dist/
 *.egg-info/
 .simplecollab/

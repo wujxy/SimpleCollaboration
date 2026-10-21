@@ -13,7 +13,7 @@ import time
 import unittest
 from unittest.mock import patch
 
-from simplecollab.runtime import RunConfig, run
+from simplecollab.runtime import RunConfig, _event_state, run
 
 
 FAKE = Path(__file__).with_name("fake_claude.py")
@@ -73,6 +73,14 @@ class RuntimeTests(unittest.TestCase):
             self.assertEqual(events[-1]["type"], "community_stopped")
             state = json.loads((config.state_dir / "members.json").read_text())
             self.assertTrue(all(member["session_id"] for member in state["members"]))
+
+    def test_completed_lifecycle_after_result_does_not_reopen_member(self):
+        self.assertEqual(
+            _event_state("idle", {"type": "command_lifecycle", "state": "completed"}),
+            "idle",
+        )
+        self.assertEqual(_event_state("idle", {"type": "assistant"}), "running")
+        self.assertEqual(_event_state("running", {"type": "result"}), "idle")
 
     def test_one_failed_member_does_not_stop_healthy_members(self):
         with tempfile.TemporaryDirectory() as raw:
