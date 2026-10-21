@@ -22,6 +22,12 @@ class CharterTests(unittest.TestCase):
         self.assertTrue(all(name in text for name in names))
         self.assertIn("SendMessage", text)
         self.assertIn("ListAgents", text)
+        self.assertIn("research team of 3 agents", text)
+        self.assertIn("organizes and divides its own work", text)
+        self.assertIn("Research is open within the team", text)
+        self.assertIn("messages are answered", text)
+        self.assertIn("help one another", text)
+        self.assertIn("problem belongs to the whole team", text)
         self.assertNotIn("reviewer", text.lower())
         self.assertNotIn("executor", text.lower())
 
